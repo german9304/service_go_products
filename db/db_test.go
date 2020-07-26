@@ -1,19 +1,39 @@
 package db
 
 import (
+	"context"
+	"goapi/model"
 	"log"
 	"testing"
 )
 
-func TestDB(t *testing.T) {
+var (
+	ctx context.Context = context.Background()
+)
 
-	db, err := Start()
-	rows, err := db.QueryAll()
+func TestQueryAll(t *testing.T) {
+	db, err := StartDatabase()
+	rows, err := db.QueryAll(ctx)
+	row, err := db.QueryRow(ctx, 1)
+	log.Println(rows)
+	log.Printf("product: %v \n", row)
+	if err != nil {
+		t.Errorf("error in database: %v \n", err.Error())
+	}
+}
 
-	p := Product{}
-
-	log.Println(p.Products(rows))
-
+func TestConcurrentQueryAll(t *testing.T) {
+	ctx := context.Background()
+	ch := make(chan []model.Product)
+	db, err := StartDatabase()
+	go func() {
+		rows, _ := db.QueryAll(ctx)
+		ch <- rows
+	}()
+	result := <-ch
+	for i := 0; i < len(result); i++ {
+		log.Println(result[i])
+	}
 	if err != nil {
 		t.Errorf("error in database")
 	}

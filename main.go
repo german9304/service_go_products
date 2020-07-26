@@ -1,9 +1,13 @@
 package main
 
 import (
+	"log"
 	"goapi/server"
 )
 
 func main() {
-	server.Run("8080")
+	err := server.Run("8080")
+	if err != nil {
+		log.Println(err)
+	}
 }

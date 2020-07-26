@@ -1,10 +1,10 @@
-package db
+package model
 
 import (
 	"database/sql"
 )
 
-// Product interface
+// Product data
 type Product struct {
 	ID    int
 	Name  string `json:"name"`
@@ -19,16 +19,16 @@ func New(name string, id, price int) Product {
 	}
 }
 
-func (p *Product) Products(rows *sql.Rows) ([]Product, error) {
-	var Products []Product
+func Products(rows *sql.Rows) ([]Product, error) {
+	var products []Product
 
 	for rows.Next() {
 		var newProduct Product = Product{}
 		if err := rows.Scan(&newProduct.ID, &newProduct.Name, &newProduct.Price); err != nil {
 			return nil, err
 		}
-		Products = append(Products, newProduct)
+		products = append(products, newProduct)
 	}
 
-	return Products, nil
+	return products, nil
 }
