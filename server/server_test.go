@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	// "strings"
 	"io/ioutil"
 )
 
+// MockProducts  used to mock database when calling in routes
 type MockProducts struct{}
 
 func (mp *MockProducts) QueryAll(ctx context.Context) ([]model.Product, error) {
@@ -24,22 +26,48 @@ func (mp *MockProducts) QueryRow(ctx context.Context, id int) (model.Product, er
 	return model.Product{1, "socks", 200}, nil
 }
 
-func TestGet(t *testing.T) {
-	const target string = "http://localhost:8080/api/"
-	mockModel := MockProducts{}
-	req := httptest.NewRequest(http.MethodGet, target, nil)
-	w := httptest.NewRecorder()
-	handler(w, req, &mockModel)
-	result := w.Result()
-	status := result.Status
-	body := result.Body
-	data, err := ioutil.ReadAll(body)
-	log.Printf("%s\n", data)
-	if status != "200 OK" {
-		t.Errorf("error %s \n", status)
-	}
+// Init variables for testing
+var (
+	myServer server       = server{}
+	mockDB   MockProducts = MockProducts{}
+)
 
+type RequestConfig struct {
+	req  *http.Request
+	resp *httptest.ResponseRecorder
+}
+
+func ResponseRequestRecorder(method, url string) RequestConfig {
+	req := httptest.NewRequest(method, url, nil)
+	resp := httptest.NewRecorder()
+	return RequestConfig{req, resp}
+}
+
+func handler(ctx *serverContext) error {
+	_, err := ctx.w.Write([]byte(`hello world`))
 	if err != nil {
-		t.Errorf("error %s \n", err.Error())
+		return err
 	}
+	return nil
+}
+
+func TestHTTPMethods(t *testing.T) {
+	myServer.POST("/api/", handler)
+	h := myServer.handlerServer(&mockDB)
+	config := ResponseRequestRecorder(http.MethodPost, "http://localhost:8080/api/")
+	h(config.resp, config.req)
+
+	if config.resp.Result().StatusCode != http.StatusOK {
+		t.Errorf("got %d, want: %d", config.resp.Result().StatusCode, http.StatusOK)
+	}
+	data, err := ioutil.ReadAll(config.resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if string(data) != "hello world" {
+		t.Errorf("got %s, want: %s", data, "hello world")
+	}
+}
+
+func TestHTTPGetMethodDB(t *testing.T) {
 }
