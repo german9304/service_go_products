@@ -9,7 +9,6 @@ import (
 )
 
 func getProducts(w http.ResponseWriter, _ *http.Request, db mydb.IDB) error {
-	w.Header().Set("Content-type", "application/json")
 	rows, err := db.QueryAll(ctx)
 	if err != nil {
 		return err

@@ -1,9 +1,10 @@
 package server
 
 import (
-	"log"
 	"context"
+	"encoding/json"
 	"goapi/model"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -28,7 +29,7 @@ func (mp *MockProducts) QueryRow(ctx context.Context, id int) (model.Product, er
 
 // Init variables for testing
 var (
-	myServer server       = server{}
+	myServer Server       = Server{}
 	mockDB   MockProducts = MockProducts{}
 )
 
@@ -43,12 +44,24 @@ func ResponseRequestRecorder(method, url string) RequestConfig {
 	return RequestConfig{req, resp}
 }
 
-func handler(ctx *serverContext) error {
-	_, err := ctx.w.Write([]byte(`hello world`))
+func handler(ctx *ServerContext) error {
+	_, err := ctx.W.Write([]byte(`hello world`))
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+type ProductsResponse struct {
+	Products []model.Product `json:"products"`
+}
+
+func databaseHanlder(ctx *ServerContext) error {
+	rows, err := ctx.DB.QueryAll(ctx.Ctx)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(ProductsResponse{rows})
 }
 
 func TestHTTPMethods(t *testing.T) {
@@ -70,4 +83,21 @@ func TestHTTPMethods(t *testing.T) {
 }
 
 func TestHTTPGetMethodDB(t *testing.T) {
+	myServer.GET("/api/", databaseHanlder)
+	h := myServer.handlerServer(&mockDB)
+	config := ResponseRequestRecorder(http.MethodGet, "http://localhost:8080/api/")
+	h(config.resp, config.req)
+	bodyData, err := ioutil.ReadAll(config.resp.Body)
+	var data ProductsResponse
+	err = json.Unmarshal(bodyData, &data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(data.Products) != 2 {
+		t.Errorf("got: %d, want: %d ", len(data.Products), 2)
+	}
+	content := config.resp.Result().Header.Get("Content-type")
+	if content != "application/json" {
+		t.Errorf("got: %s, want: %s ", content, "application/json")
+	}
 }
