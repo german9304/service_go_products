@@ -57,21 +57,6 @@ func (s *Server) PUT(path string, h handlerContext) {
 	s.routes = append(s.routes, newRoute)
 }
 
-func (s *Server) handleHTTPMethod(currentMethod string, ctx ServerContext) {
-	switch currentMethod {
-	case http.MethodGet:
-		log.Println("method GET!!!")
-		return
-	case http.MethodPost:
-		log.Println("method POST!!!")
-		return
-	case http.MethodPut:
-		log.Println("mehod PUT")
-	default:
-		log.Println("Default case")
-	}
-}
-
 func (s *Server) handlerServer(db mydb.IDB) http.HandlerFunc {
 	backgroundCtx := context.Background()
 	return func(w http.ResponseWriter, r *http.Request) {
