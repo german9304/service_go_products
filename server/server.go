@@ -57,15 +57,18 @@ func (s *Server) PUT(path string, h handlerContext) {
 	s.routes = append(s.routes, newRoute)
 }
 
+func isValidMethod(currentRoute route, req *http.Request) bool {
+	isCorrectMethod := currentRoute.method == req.Method
+	isCorrectPath := currentRoute.path == req.URL.Path
+	return isCorrectMethod && isCorrectPath
+}
+
 func (s *Server) handlerServer(db mydb.IDB) http.HandlerFunc {
-	backgroundCtx := context.Background()
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := ServerContext{w, r, db, backgroundCtx}
+		ctx := ServerContext{w, r, db, context.Background()}
 		for i := 0; i < len(s.routes); i++ {
 			currentRoute := s.routes[i]
-			isCorrectMethod := currentRoute.method == r.Method
-			isCorrectPath := currentRoute.path == r.URL.Path
-			if isCorrectMethod && isCorrectPath {
+			if isValidMethod(currentRoute, r) {
 				err := currentRoute.h(&ctx)
 				if err != nil {
 					log.Fatal(err)
