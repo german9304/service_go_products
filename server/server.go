@@ -12,6 +12,12 @@ var (
 	ctx context.Context = context.Background()
 )
 
+func isValidMethod(currentRoute route, req *http.Request) bool {
+	isCorrectMethod := currentRoute.method == req.Method
+	isCorrectPath := currentRoute.path == req.URL.Path
+	return isCorrectMethod && isCorrectPath
+}
+
 type ServerContext struct {
 	W  http.ResponseWriter
 	R   *http.Request
@@ -55,12 +61,6 @@ func (s *Server) GET(path string, h handlerContext) {
 func (s *Server) PUT(path string, h handlerContext) {
 	newRoute := route{http.MethodPut, path, h}
 	s.routes = append(s.routes, newRoute)
-}
-
-func isValidMethod(currentRoute route, req *http.Request) bool {
-	isCorrectMethod := currentRoute.method == req.Method
-	isCorrectPath := currentRoute.path == req.URL.Path
-	return isCorrectMethod && isCorrectPath
 }
 
 func (s *Server) handlerServer(db mydb.IDB) http.HandlerFunc {
