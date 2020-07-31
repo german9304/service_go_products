@@ -11,7 +11,6 @@ import (
 	// "strings"
 	"io/ioutil"
 )
-
 // MockProducts  used to mock database when calling in routes
 type MockProducts struct{}
 
@@ -65,8 +64,9 @@ func databaseHanlder(ctx *ServerContext) error {
 }
 
 func TestHTTPMethods(t *testing.T) {
+	ctx := context.Background()
 	myServer.POST("/api/", handler)
-	h := myServer.handlerServer(&mockDB)
+	h := myServer.handlerServer(&mockDB, ctx)
 	config := ResponseRequestRecorder(http.MethodPost, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 
@@ -83,8 +83,9 @@ func TestHTTPMethods(t *testing.T) {
 }
 
 func TestHTTPGetMethodDB(t *testing.T) {
+	ctx := context.Background()
 	myServer.GET("/api/", databaseHanlder)
-	h := myServer.handlerServer(&mockDB)
+	h := myServer.handlerServer(&mockDB, ctx)
 	config := ResponseRequestRecorder(http.MethodGet, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 	bodyData, err := ioutil.ReadAll(config.resp.Body)

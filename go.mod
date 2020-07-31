@@ -3,5 +3,5 @@ module goapi
 go 1.14
 
 require (
-	github.com/lib/pq v1.7.0
+	github.com/jackc/pgx/v4 v4.8.1
 )

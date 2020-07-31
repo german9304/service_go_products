@@ -8,10 +8,6 @@ import (
 	"net/http"
 )
 
-var (
-	ctx context.Context = context.Background()
-)
-
 func isValidMethod(currentRoute route, req *http.Request) bool {
 	isCorrectMethod := currentRoute.method == req.Method
 	isCorrectPath := currentRoute.path == req.URL.Path
@@ -63,9 +59,9 @@ func (s *Server) PUT(path string, h handlerContext) {
 	s.routes = append(s.routes, newRoute)
 }
 
-func (s *Server) handlerServer(db mydb.IDB) http.HandlerFunc {
+func (s *Server) handlerServer(db mydb.IDB, ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := ServerContext{w, r, db, context.Background()}
+		ctx := ServerContext{w, r, db, ctx}
 		for i := 0; i < len(s.routes); i++ {
 			currentRoute := s.routes[i]
 			if isValidMethod(currentRoute, r) {
@@ -79,10 +75,11 @@ func (s *Server) handlerServer(db mydb.IDB) http.HandlerFunc {
 }
 
 func (s *Server) Run(port string) error {
+	ctx := context.Background()
 	url := ":" + port
-	db, err := mydb.StartDatabase()
+	db, err := mydb.StartDatabase(ctx)
 	log.Printf("listening on port http://localhost%s \n", url)
-	err = http.ListenAndServe(url, s.handlerServer(&db))
+	err = http.ListenAndServe(url, s.handlerServer(&db, ctx))
 	if err != nil {
 		return err
 	}

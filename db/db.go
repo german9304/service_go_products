@@ -2,11 +2,10 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"goapi/model"
 	"log"
 
-	_ "github.com/lib/pq"
+	pgx "github.com/jackc/pgx/v4"
 )
 
 // IDB Defines the Product interface, that receives a context
@@ -16,12 +15,12 @@ type IDB interface {
 }
 
 type DB struct {
-	db *sql.DB
+	db *pgx.Conn
 }
 
 // QueryAll elements from db
 func (sqlDB *DB) QueryAll(ctx context.Context) ([]model.Product, error) {
-	rows, err := sqlDB.db.QueryContext(ctx, "SELECT id, name, price FROM products")
+	rows, err := sqlDB.db.Query(ctx, "SELECT id, name, price FROM products")
 	if err != nil {
 		return nil, err
 	}
@@ -35,8 +34,9 @@ func (sqlDB *DB) QueryAll(ctx context.Context) ([]model.Product, error) {
 	return model.Products(rows)
 }
 
+// Queries a single row 
 func (sqlDB *DB) QueryRow(ctx context.Context, id int) (model.Product, error) {
-	row := sqlDB.db.QueryRowContext(ctx, "SELECT id, name, price FROM Products WHERE id = $1", id)
+	row := sqlDB.db.QueryRow(ctx, "SELECT id, name, price FROM Products WHERE id = $1", id)
 	product := model.Product{}
 	err := row.Scan(&product.ID, &product.Name, &product.Price)
 	if err != nil {
@@ -45,9 +45,9 @@ func (sqlDB *DB) QueryRow(ctx context.Context, id int) (model.Product, error) {
 	return product, nil
 }
 
-func StartDatabase() (DB, error) {
-	connStr := "user=postgres dbname=mydb password='user123456' sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
+func StartDatabase(ctx context.Context) (DB, error) {
+	const URL = "postgres://postgres:user123456@localhost:5432/mydb?sslmode=disable"
+	db, err := pgx.Connect(ctx, URL)
 	if err != nil {
 		return DB{}, err
 	}

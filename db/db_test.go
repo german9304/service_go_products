@@ -12,7 +12,10 @@ var (
 )
 
 func TestQueryAll(t *testing.T) {
-	db, err := StartDatabase()
+	db, err := StartDatabase(ctx)
+	if err != nil {
+		t.Errorf("error in database: %v \n", err.Error())
+	}
 	rows, err := db.QueryAll(ctx)
 	row, err := db.QueryRow(ctx, 1)
 	log.Println(rows)
@@ -25,7 +28,7 @@ func TestQueryAll(t *testing.T) {
 func TestConcurrentQueryAll(t *testing.T) {
 	ctx := context.Background()
 	ch := make(chan []model.Product)
-	db, err := StartDatabase()
+	db, err := StartDatabase(ctx)
 	go func() {
 		rows, _ := db.QueryAll(ctx)
 		ch <- rows

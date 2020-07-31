@@ -1,7 +1,7 @@
 package model
 
 import (
-	"database/sql"
+	pgx "github.com/jackc/pgx/v4"
 )
 
 // Product data
@@ -19,7 +19,7 @@ func New(name string, id, price int) Product {
 	}
 }
 
-func Products(rows *sql.Rows) ([]Product, error) {
+func Products(rows pgx.Rows) ([]Product, error) {
 	var products []Product
 
 	for rows.Next() {
