@@ -11,6 +11,7 @@ import (
 	// "strings"
 	"io/ioutil"
 )
+
 // MockProducts  used to mock database when calling in routes
 type MockProducts struct{}
 

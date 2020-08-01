@@ -5,8 +5,8 @@ import (
 	"goapi/model"
 	"log"
 
-	"github.com/rs/xid"
 	pgx "github.com/jackc/pgx/v4"
+	"github.com/rs/xid"
 )
 
 // IDB Defines the Product interface, that receives a context
@@ -16,7 +16,7 @@ type IDB interface {
 }
 
 type DB struct {
-	db *pgx.Conn
+	db  *pgx.Conn
 	ctx context.Context
 }
 
@@ -40,7 +40,7 @@ func (sqlDB *DB) QueryAll() ([]model.Product, error) {
 	return model.Products(rows)
 }
 
-// Queries a single row 
+// Queries a single row
 func (sqlDB *DB) QueryRow(id string) (model.Product, error) {
 	const SQL_STATEMENT = `
 	SELECT id, name, price 

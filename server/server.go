@@ -1,8 +1,8 @@
 package server
 
 import (
-	"encoding/json"
 	"context"
+	"encoding/json"
 	mydb "goapi/db"
 	"log"
 	"net/http"
@@ -15,7 +15,7 @@ func isValidMethod(currentRoute route, req *http.Request) bool {
 }
 
 type ServerContext struct {
-	W  http.ResponseWriter
+	W   http.ResponseWriter
 	R   *http.Request
 	DB  mydb.IDB
 	Ctx context.Context

@@ -2,8 +2,8 @@ package main
 
 import (
 	"goapi/model"
-	"log"
 	"goapi/server"
+	"log"
 )
 
 func main() {
@@ -12,7 +12,7 @@ func main() {
 		rows, err := ctx.DB.QueryAll()
 		type ProductsResponse struct {
 			Products []model.Product `json:"products"`
-		}		
+		}
 		if err != nil {
 			return err
 		}
