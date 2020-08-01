@@ -6,12 +6,12 @@ import (
 
 // Product data
 type Product struct {
-	ID    int
+	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Price int    `json:"price"`
 }
 
-func New(name string, id, price int) Product {
+func New(id, name string, price int) Product {
 	return Product{
 		id,
 		name,

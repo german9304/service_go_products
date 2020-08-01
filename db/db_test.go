@@ -16,8 +16,8 @@ func TestQueryAll(t *testing.T) {
 	if err != nil {
 		t.Errorf("error in database: %v \n", err.Error())
 	}
-	rows, err := db.QueryAll(ctx)
-	row, err := db.QueryRow(ctx, 1)
+	rows, err := db.QueryAll()
+	row, err := db.QueryRow("1")
 	log.Println(rows)
 	log.Printf("product: %v \n", row)
 	if err != nil {
@@ -30,7 +30,7 @@ func TestConcurrentQueryAll(t *testing.T) {
 	ch := make(chan []model.Product)
 	db, err := StartDatabase(ctx)
 	go func() {
-		rows, _ := db.QueryAll(ctx)
+		rows, _ := db.QueryAll()
 		ch <- rows
 	}()
 	result := <-ch
@@ -39,5 +39,20 @@ func TestConcurrentQueryAll(t *testing.T) {
 	}
 	if err != nil {
 		t.Errorf("error in database")
+	}
+}
+
+func TestCreateRow(t *testing.T) {
+	ctx := context.Background()
+	db, err := StartDatabase(ctx)
+	name := "furniture"
+	price := 430
+	newProduct, err := db.CreateRow(name, price)
+	if newProduct.Name != name {
+		t.Errorf("got: %s, want: %s \n", newProduct.Name, name)
+	}
+	_, err = db.DeleteRow(newProduct.ID)
+	if err != nil {
+		t.Errorf("error: %s ", err)
 	}
 }

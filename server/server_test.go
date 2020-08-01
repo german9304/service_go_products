@@ -14,16 +14,16 @@ import (
 // MockProducts  used to mock database when calling in routes
 type MockProducts struct{}
 
-func (mp *MockProducts) QueryAll(ctx context.Context) ([]model.Product, error) {
+func (mp *MockProducts) QueryAll() ([]model.Product, error) {
 	products := []model.Product{
-		model.Product{1, "shoes", 100},
-		model.Product{2, "pants", 10},
+		model.Product{"3o3o3", "shoes", 100},
+		model.Product{"3020222", "pants", 10},
 	}
 	return products, nil
 }
 
-func (mp *MockProducts) QueryRow(ctx context.Context, id int) (model.Product, error) {
-	return model.Product{1, "socks", 200}, nil
+func (mp *MockProducts) QueryRow(id string) (model.Product, error) {
+	return model.Product{"123333", "socks", 200}, nil
 }
 
 // Init variables for testing
@@ -56,7 +56,7 @@ type ProductsResponse struct {
 }
 
 func databaseHanlder(ctx *ServerContext) error {
-	rows, err := ctx.DB.QueryAll(ctx.Ctx)
+	rows, err := ctx.DB.QueryAll()
 	if err != nil {
 		return err
 	}

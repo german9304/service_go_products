@@ -13,9 +13,9 @@ type PTests struct {
 func TestProduct(t *testing.T) {
 	names := []string{"socks", "shoes", "computer"}
 	tests := []PTests{
-		PTests{"socks", New("socks", 1, 34)},
-		PTests{names[1], New(names[1], 2, 100)},
-		PTests{names[2], New(names[2], 3, 50)},
+		PTests{"socks", New("12334", "socks", 34)},
+		PTests{names[1], New("330303", names[1], 100)},
+		PTests{names[2], New("112222", names[2], 50)},
 	}
 
 	for i, v := range tests {

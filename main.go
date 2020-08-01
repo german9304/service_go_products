@@ -9,7 +9,7 @@ import (
 func main() {
 	myServer := server.Server{}
 	myServer.GET("/api/products", func(ctx *server.ServerContext) error {
-		rows, err := ctx.DB.QueryAll(ctx.Ctx)
+		rows, err := ctx.DB.QueryAll()
 		type ProductsResponse struct {
 			Products []model.Product `json:"products"`
 		}		
