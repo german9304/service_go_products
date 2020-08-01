@@ -13,6 +13,8 @@ import (
 type IDB interface {
 	QueryAll() ([]model.Product, error)
 	QueryRow(id string) (model.Product, error)
+	CreateRow(name string, price int) (model.Product, error)
+	DeleteRow(id string) (string, error)
 }
 
 type DB struct {
