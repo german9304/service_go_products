@@ -1,0 +1,23 @@
+version: '3'
+services:
+  database:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment: 
+      POSTGRES_PASSWORD: testing123
+      POSTGRES_USER: user@test
+      POSTGRES_DB: mydb
+    volumes:
+      - mydata:/var/lib/postgresql/data
+
+  backend:
+    ports:
+      - 8080:8080
+    build:
+      context: ./
+    volumes:
+      - ./:/backend/
+
+volumes:
+  mydata:

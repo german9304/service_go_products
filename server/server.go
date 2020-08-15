@@ -78,6 +78,9 @@ func (s *Server) Run(port string) error {
 	ctx := context.Background()
 	url := ":" + port
 	db, err := mydb.StartDatabase(ctx)
+	if err != nil {
+		return err
+	}
 	log.Printf("listening on port http://localhost%s \n", url)
 	err = http.ListenAndServe(url, s.handlerServer(&db, ctx))
 	if err != nil {

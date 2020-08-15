@@ -16,12 +16,9 @@ func TestQueryAll(t *testing.T) {
 	if err != nil {
 		t.Errorf("error in database: %v \n", err.Error())
 	}
-	rows, err := db.QueryAll()
-	row, err := db.QueryRow("1")
-	log.Println(rows)
-	log.Printf("product: %v \n", row)
-	if err != nil {
-		t.Errorf("error in database: %v \n", err.Error())
+	_, errQAll := db.QueryAll()
+	if errQAll != nil {
+		t.Errorf("error in database: %v \n", errQAll.Error())
 	}
 }
 
