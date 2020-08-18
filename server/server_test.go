@@ -111,3 +111,16 @@ func TestHTTPGetMethodDB(t *testing.T) {
 		t.Errorf("got: %s, want: %s ", content, "application/json")
 	}
 }
+
+func TestMethodNotAllowed(t *testing.T) {
+	ctx := context.Background()
+	myServer.GET("/api/", databaseHanlder)
+	h := myServer.handlerServer(&mockDB, ctx)
+	config := ResponseRequestRecorder(http.MethodPut, "http://localhost:8080/api/")
+	h(config.resp, config.req)
+	log.Printf("response status: %d \n", config.resp.Result().StatusCode)
+	responseStatusCode := config.resp.Result().StatusCode
+	if  responseStatusCode != 405 {
+		t.Errorf("got: %d want %d \n", responseStatusCode, 405)
+	}
+}

@@ -65,12 +65,17 @@ func (s *Server) handlerServer(db mydb.IDB, ctx context.Context) http.HandlerFun
 		for i := 0; i < len(s.routes); i++ {
 			currentRoute := s.routes[i]
 			if isValidMethod(currentRoute, r) {
+				log.Println("method allowed", currentRoute)
 				err := currentRoute.h(&ctx)
 				if err != nil {
 					log.Fatal(err)
 				}
+				return
 			}
 		}
+		log.Println("method not allowed")
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
 }
 
