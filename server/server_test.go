@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"goapi/mock"
 	"goapi/model"
 	"log"
 	"net/http"
@@ -12,33 +13,10 @@ import (
 	"io/ioutil"
 )
 
-// MockProducts  used to mock database when calling in routes
-type MockProducts struct{}
-
-func (mp *MockProducts) QueryAll() ([]model.Product, error) {
-	products := []model.Product{
-		model.Product{"3o3o3", "shoes", 100},
-		model.Product{"3020222", "pants", 10},
-	}
-	return products, nil
-}
-
-func (mp *MockProducts) QueryRow(id string) (model.Product, error) {
-	return model.Product{"123333", "socks", 200}, nil
-}
-
-func (mp *MockProducts) CreateRow(name string, price int) (model.Product, error) {
-	return model.New("1223", name, price), nil
-}
-
-func (mp *MockProducts) DeleteRow(id string) (string, error) {
-	return "123", nil
-}
-
 // Init variables for testing
 var (
-	myServer Server       = Server{}
-	mockDB   MockProducts = MockProducts{}
+	myServer Server            = Server{}
+	mockDB   mock.MockProducts = mock.MockProducts{}
 )
 
 type RequestConfig struct {
@@ -75,7 +53,7 @@ func databaseHanlder(ctx *ServerContext) error {
 func TestHTTPMethods(t *testing.T) {
 	ctx := context.Background()
 	myServer.POST("/api/", handler)
-	h := myServer.handlerServer(&mockDB, ctx)
+	h := myServer.handlerServer(ctx, &mockDB)
 	config := ResponseRequestRecorder(http.MethodPost, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 
@@ -94,7 +72,7 @@ func TestHTTPMethods(t *testing.T) {
 func TestHTTPGetMethodDB(t *testing.T) {
 	ctx := context.Background()
 	myServer.GET("/api/", databaseHanlder)
-	h := myServer.handlerServer(&mockDB, ctx)
+	h := myServer.handlerServer(ctx, &mockDB)
 	config := ResponseRequestRecorder(http.MethodGet, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 	bodyData, err := ioutil.ReadAll(config.resp.Body)
@@ -115,12 +93,12 @@ func TestHTTPGetMethodDB(t *testing.T) {
 func TestMethodNotAllowed(t *testing.T) {
 	ctx := context.Background()
 	myServer.GET("/api/", databaseHanlder)
-	h := myServer.handlerServer(&mockDB, ctx)
+	h := myServer.handlerServer(ctx, &mockDB)
 	config := ResponseRequestRecorder(http.MethodPut, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 	log.Printf("response status: %d \n", config.resp.Result().StatusCode)
 	responseStatusCode := config.resp.Result().StatusCode
-	if  responseStatusCode != 405 {
+	if responseStatusCode != 405 {
 		t.Errorf("got: %d want %d \n", responseStatusCode, 405)
 	}
 }

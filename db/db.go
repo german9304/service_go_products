@@ -9,8 +9,8 @@ import (
 	"github.com/rs/xid"
 )
 
-// IDB Defines the Product interface, that receives a context
-type IDB interface {
+// Database Defines the Product interface, that receives a context
+type Database interface {
 	QueryAll() ([]model.Product, error)
 	QueryRow(id string) (model.Product, error)
 	CreateRow(name string, price int) (model.Product, error)
