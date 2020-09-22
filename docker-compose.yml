@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: mydb
     volumes:
       - mydata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d/
 
   backend:
     ports:
