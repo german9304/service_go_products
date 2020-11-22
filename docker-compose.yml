@@ -12,13 +12,5 @@ services:
       - mydata:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d/
 
-  backend:
-    ports:
-      - 8080:8080
-    build:
-      context: ./
-    volumes:
-      - ./:/backend/
-
 volumes:
   mydata:
