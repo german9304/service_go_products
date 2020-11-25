@@ -11,6 +11,15 @@ services:
     volumes:
       - mydata:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d/
+  
+  backend:
+    image: golang:latest
+    ports:
+      - 8080:8080
+    volumes: 
+      - ./:/backend/
+    working_dir: /backend/cmd/
+    command: ["go", "run", "main.go"]
 
 volumes:
   mydata:

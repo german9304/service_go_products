@@ -90,8 +90,8 @@ func (sqlDB *DB) DeleteRow(id string) (string, error) {
 	return id, nil
 }
 
-func StartDatabase(ctx context.Context) (DB, error) {
-	const URL = "postgres://user@test:testing123@localhost:5432/mydb?sslmode=disable"
+func Start(ctx context.Context) (DB, error) {
+	const URL = "postgres://user@test:testing123@database:5432/mydb?sslmode=disable"
 	db, err := pgx.Connect(ctx, URL)
 	if err != nil {
 		return DB{}, err

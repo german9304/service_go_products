@@ -40,20 +40,24 @@ type route struct {
 	h      HandlerContext
 }
 
+// Server defines the server type
 type Server struct {
 	routes []route
 }
 
+// POST route for HTTP POST request
 func (s *Server) POST(path string, h HandlerContext) {
 	newRoute := route{http.MethodPost, path, h}
 	s.routes = append(s.routes, newRoute)
 }
 
+// GET route for HTTP GET request
 func (s *Server) GET(path string, h HandlerContext) {
 	newRoute := route{http.MethodGet, path, h}
 	s.routes = append(s.routes, newRoute)
 }
 
+// PUT route for HTTP PUT request
 func (s *Server) PUT(path string, h HandlerContext) {
 	newRoute := route{http.MethodPut, path, h}
 	s.routes = append(s.routes, newRoute)
@@ -82,7 +86,7 @@ func (s *Server) handlerServer(ctx context.Context, db mydb.Database) http.Handl
 func (s *Server) Run(port string) error {
 	ctx := context.Background()
 	url := ":" + port
-	db, err := mydb.StartDatabase(ctx)
+	db, err := mydb.Start(ctx)
 	if err != nil {
 		return err
 	}
