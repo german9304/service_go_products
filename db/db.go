@@ -17,6 +17,7 @@ type Database interface {
 	DeleteRow(id string) (string, error)
 }
 
+// DB defines a database type
 type DB struct {
 	db  *pgx.Conn
 	ctx context.Context
@@ -24,11 +25,11 @@ type DB struct {
 
 // QueryAll elements from db
 func (sqlDB *DB) QueryAll() ([]model.Product, error) {
-	const SQL_STATEMENT = `
+	const SQLSTATEMENT = `
 	SELECT id, name, price 
 	FROM products
 	`
-	rows, err := sqlDB.db.Query(sqlDB.ctx, SQL_STATEMENT)
+	rows, err := sqlDB.db.Query(sqlDB.ctx, SQLSTATEMENT)
 	if err != nil {
 		return nil, err
 	}
@@ -42,13 +43,13 @@ func (sqlDB *DB) QueryAll() ([]model.Product, error) {
 	return model.Products(rows)
 }
 
-// Queries a single row
+// QueryRow queries a single row
 func (sqlDB *DB) QueryRow(id string) (model.Product, error) {
-	const SQL_STATEMENT = `
+	const SQLSTATEMENT = `
 	SELECT id, name, price 
 	FROM Products WHERE id = $1
 	`
-	row := sqlDB.db.QueryRow(sqlDB.ctx, SQL_STATEMENT, id)
+	row := sqlDB.db.QueryRow(sqlDB.ctx, SQLSTATEMENT, id)
 	product := model.Product{}
 	err := row.Scan(&product.ID, &product.Name, &product.Price)
 	if err != nil {
@@ -59,14 +60,14 @@ func (sqlDB *DB) QueryRow(id string) (model.Product, error) {
 
 // CreateRow creates a new row in the database
 func (sqlDB *DB) CreateRow(name string, price int) (model.Product, error) {
-	const SQL_STATEMENT = `
+	const SQLSTATEMENT = `
 	INSERT INTO products (id, name, price)
 	VALUES ($1, $2, $3)
 	RETURNING id
 	`
 	guid := xid.New()
 	var productID string
-	row := sqlDB.db.QueryRow(sqlDB.ctx, SQL_STATEMENT, guid, name, price)
+	row := sqlDB.db.QueryRow(sqlDB.ctx, SQLSTATEMENT, guid, name, price)
 	err := row.Scan(&productID)
 	if err != nil {
 		return model.Product{}, err
@@ -76,13 +77,13 @@ func (sqlDB *DB) CreateRow(name string, price int) (model.Product, error) {
 
 // DeleteRow deletes a row in the database
 func (sqlDB *DB) DeleteRow(id string) (string, error) {
-	const SQL_STATEMENT = `
+	const SQLSTATEMENT = `
 	DELETE FROM products 
 	WHERE id = $1
 	RETURNING id
 	`
 	var productID string
-	row := sqlDB.db.QueryRow(sqlDB.ctx, SQL_STATEMENT, id)
+	row := sqlDB.db.QueryRow(sqlDB.ctx, SQLSTATEMENT, id)
 	err := row.Scan(&productID)
 	if err != nil {
 		return "", err
@@ -90,6 +91,7 @@ func (sqlDB *DB) DeleteRow(id string) (string, error) {
 	return id, nil
 }
 
+// Start starts a database connection
 func Start(ctx context.Context) (DB, error) {
 	const URL = "postgres://user@test:testing123@database:5432/mydb?sslmode=disable"
 	db, err := pgx.Connect(ctx, URL)
