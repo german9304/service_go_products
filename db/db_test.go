@@ -45,6 +45,10 @@ func TestCreateRow(t *testing.T) {
 	name := "furniture"
 	price := 430
 	newProduct, err := db.CreateRow(name, price)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("product %v \n", newProduct)
 	if newProduct.Name != name {
 		t.Errorf("got: %s, want: %s \n", newProduct.Name, name)
 	}

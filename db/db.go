@@ -2,10 +2,14 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"goapi/model"
 	"log"
 
-	pgx "github.com/jackc/pgx/v4"
+	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/stdlib"
+
 	"github.com/rs/xid"
 )
 
@@ -19,17 +23,18 @@ type Database interface {
 
 // DB defines a database type
 type DB struct {
-	db  *pgx.Conn
+	db  *sql.DB
 	ctx context.Context
 }
 
 // QueryAll elements from db
 func (sqlDB *DB) QueryAll() ([]model.Product, error) {
-	const SQLSTATEMENT = `
-	SELECT id, name, price 
-	FROM products
-	`
-	rows, err := sqlDB.db.Query(sqlDB.ctx, SQLSTATEMENT)
+	statement := sq.
+		Select("id, name, price").
+		From("products").
+		RunWith(sqlDB.db)
+
+	rows, err := statement.Query()
 	if err != nil {
 		return nil, err
 	}
@@ -45,13 +50,13 @@ func (sqlDB *DB) QueryAll() ([]model.Product, error) {
 
 // QueryRow queries a single row
 func (sqlDB *DB) QueryRow(id string) (model.Product, error) {
-	const SQLSTATEMENT = `
-	SELECT id, name, price 
-	FROM Products WHERE id = $1
-	`
-	row := sqlDB.db.QueryRow(sqlDB.ctx, SQLSTATEMENT, id)
+	statement := sq.
+		Select("id, name, price").
+		From("products").
+		Where("id", id)
+
 	product := model.Product{}
-	err := row.Scan(&product.ID, &product.Name, &product.Price)
+	err := statement.Scan(&product.ID, &product.Name, &product.Price)
 	if err != nil {
 		return model.Product{}, err
 	}
@@ -60,43 +65,49 @@ func (sqlDB *DB) QueryRow(id string) (model.Product, error) {
 
 // CreateRow creates a new row in the database
 func (sqlDB *DB) CreateRow(name string, price int) (model.Product, error) {
-	const SQLSTATEMENT = `
-	INSERT INTO products (id, name, price)
-	VALUES ($1, $2, $3)
-	RETURNING id
-	`
 	guid := xid.New()
 	var productID string
-	row := sqlDB.db.QueryRow(sqlDB.ctx, SQLSTATEMENT, guid, name, price)
-	err := row.Scan(&productID)
+	statement := sq.
+		Insert("products").
+		Columns("id", "name", "price").
+		Values(guid, name, price).
+		RunWith(sqlDB.db).
+		PlaceholderFormat(sq.Dollar)
+
+	_, err := statement.Exec()
 	if err != nil {
+		log.Println("error on create row", err)
 		return model.Product{}, err
 	}
+
+	log.Printf("current product id %s \n", productID)
 	return model.New(guid.String(), name, price), nil
 }
 
 // DeleteRow deletes a row in the database
 func (sqlDB *DB) DeleteRow(id string) (string, error) {
-	const SQLSTATEMENT = `
-	DELETE FROM products 
-	WHERE id = $1
-	RETURNING id
-	`
-	var productID string
-	row := sqlDB.db.QueryRow(sqlDB.ctx, SQLSTATEMENT, id)
-	err := row.Scan(&productID)
+	statement := sq.Delete("products").Where("id = $1", id).RunWith(sqlDB.db)
+	r, err := statement.Exec()
 	if err != nil {
 		return "", err
 	}
+	dr, _ := r.RowsAffected()
+	log.Printf("removed row %d \n", dr)
 	return id, nil
 }
 
 // Start starts a database connection
 func Start(ctx context.Context) (DB, error) {
 	const URL = "postgres://user@test:testing123@database:5432/mydb?sslmode=disable"
-	db, err := pgx.Connect(ctx, URL)
+	c, err := pgx.ParseConfig(URL)
+	if err != nil {
+		log.Println("error here")
+		log.Fatal(err)
+	}
+	connStr := stdlib.RegisterConnConfig(c)
+	db, err := sql.Open("pgx", connStr)
 	if err != nil {
 		return DB{}, err
 	}
-	return DB{db, ctx}, nil
+	return DB{db: db, ctx: ctx}, nil
 }
