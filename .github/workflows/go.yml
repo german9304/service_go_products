@@ -3,8 +3,8 @@ name: Go
 on:
   push:
     branches:
-      - 'feature/**',
-      - 'master'
+      - master
+      - 'feature/**'
   pull_request:
     branches: [ master ]
 
