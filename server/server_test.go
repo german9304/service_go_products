@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"encoding/json"
 	"goapi/mock"
 	"goapi/model"
@@ -9,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
 	// "strings"
 	"io/ioutil"
 )
@@ -51,9 +51,8 @@ func databaseHanlder(ctx *ServerContext) error {
 }
 
 func TestHTTPMethods(t *testing.T) {
-	ctx := context.Background()
 	myServer.POST("/api/", handler)
-	h := myServer.handlerServer(ctx, &mockDB)
+	h := myServer.handlerServer(&mockDB)
 	config := ResponseRequestRecorder(http.MethodPost, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 
@@ -70,9 +69,8 @@ func TestHTTPMethods(t *testing.T) {
 }
 
 func TestHTTPGetMethodDB(t *testing.T) {
-	ctx := context.Background()
 	myServer.GET("/api/", databaseHanlder)
-	h := myServer.handlerServer(ctx, &mockDB)
+	h := myServer.handlerServer(&mockDB)
 	config := ResponseRequestRecorder(http.MethodGet, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 	bodyData, err := ioutil.ReadAll(config.resp.Body)
@@ -91,9 +89,8 @@ func TestHTTPGetMethodDB(t *testing.T) {
 }
 
 func TestMethodNotAllowed(t *testing.T) {
-	ctx := context.Background()
 	myServer.GET("/api/", databaseHanlder)
-	h := myServer.handlerServer(ctx, &mockDB)
+	h := myServer.handlerServer(&mockDB)
 	config := ResponseRequestRecorder(http.MethodPut, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 	log.Printf("response status: %d \n", config.resp.Result().StatusCode)

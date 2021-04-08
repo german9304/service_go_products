@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"database/sql"
 	"goapi/model"
 	"log"
@@ -23,8 +22,7 @@ type Database interface {
 
 // DB defines a database type
 type DB struct {
-	db  *sql.DB
-	ctx context.Context
+	db *sql.DB
 }
 
 // QueryAll elements from db
@@ -37,13 +35,6 @@ func (sqlDB *DB) QueryAll() ([]model.Product, error) {
 	rows, err := statement.Query()
 	if err != nil {
 		return nil, err
-	}
-	select {
-	case <-sqlDB.ctx.Done():
-		log.Println("there is an error in the database")
-		return nil, sqlDB.ctx.Err()
-	default:
-		log.Println("no error in the database")
 	}
 	return model.Products(rows)
 }
@@ -97,7 +88,7 @@ func (sqlDB *DB) DeleteRow(id string) (string, error) {
 }
 
 // Start starts a database connection
-func Start(ctx context.Context) (DB, error) {
+func Start() (DB, error) {
 	const URL = "postgres://user@test:testing123@database:5432/mydb?sslmode=disable"
 	c, err := pgx.ParseConfig(URL)
 	if err != nil {
@@ -109,5 +100,5 @@ func Start(ctx context.Context) (DB, error) {
 	if err != nil {
 		return DB{}, err
 	}
-	return DB{db: db, ctx: ctx}, nil
+	return DB{db: db}, nil
 }
