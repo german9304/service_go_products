@@ -70,7 +70,7 @@ func (s *Server) handlerServer(ctx context.Context, db mydb.Database) http.Handl
 		for i := 0; i < len(s.routes); i++ {
 			currentRoute := s.routes[i]
 			if isValidMethod(currentRoute, r) {
-				log.Println("method allowed", currentRoute)
+				log.Println("method is allowed", currentRoute)
 				err := currentRoute.h(&ctx)
 				if err != nil {
 					log.Fatal(err)
