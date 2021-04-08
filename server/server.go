@@ -63,6 +63,7 @@ func (s *Server) PUT(path string, h HandlerContext) {
 	s.routes = append(s.routes, newRoute)
 }
 
+// handles any incoming requests and maps the request to its HTTP method
 func (s *Server) handlerServer(ctx context.Context, db mydb.Database) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := ServerContext{w, r, db, ctx}
