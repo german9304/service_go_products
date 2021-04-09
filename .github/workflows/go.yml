@@ -23,6 +23,9 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: format
+      run: go fmt ./...
+
     - name: Test
       run: go test -v ./...
       
