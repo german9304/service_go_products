@@ -6,6 +6,8 @@ import (
 	"goapi/server"
 	"io/ioutil"
 	"log"
+
+	"github.com/joho/godotenv"
 )
 
 type message struct {
@@ -54,11 +56,17 @@ func createProductHandler(ctx *server.ServerContext) error {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(err)
+		log.Fatal("Error loading .env file")
+	}
+
 	myServer := server.Server{}
 	myServer.GET("/api/products", productsHandler)
 	myServer.GET("/api/product", productHandler)
 	myServer.POST("/api/product", createProductHandler)
-	err := myServer.Run("8080")
+	err = myServer.Run("8080")
 	if err != nil {
 		log.Println(err)
 	}

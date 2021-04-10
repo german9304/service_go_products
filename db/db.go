@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"goapi/model"
 	"log"
+	"os"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
@@ -87,10 +88,24 @@ func (sqlDB *DB) DeleteRow(id string) (string, error) {
 	return id, nil
 }
 
+// get url based on MODE env variable
+func Url() string {
+	mode := os.Getenv("MODE")
+
+	// if database should be fetch from internal docker network (by docker-compose)
+	if mode == "DOCKER" {
+		dockerUrl := os.Getenv("DATABASE_DOCKER_URL")
+		return dockerUrl
+	}
+
+	// if database should be fetch from localhost
+	dockerUrl := os.Getenv("DATABASE_DEV_URL")
+	return dockerUrl
+}
+
 // Start starts a database connection
 func Start() (DB, error) {
-	const URL = "postgres://user@test:testing123@database:5432/mydb?sslmode=disable"
-	c, err := pgx.ParseConfig(URL)
+	c, err := pgx.ParseConfig(Url())
 	if err != nil {
 		log.Println("error here")
 		log.Fatal(err)

@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"goapi/mock"
 	"goapi/server"
 	"net/http"
@@ -11,7 +10,6 @@ import (
 
 var (
 	mockDB mock.MockProducts = mock.MockProducts{}
-	ctx    context.Context   = context.Background()
 )
 
 func handler(ctx *server.ServerContext) error {
@@ -33,7 +31,7 @@ func ResponseRequestRecorder(method, url string) RequestConfig {
 	return RequestConfig{req, resp}
 }
 
-func TestHandler(t *testing.T) {
+func TestUnauthorizedHandler(t *testing.T) {
 	authHandler := Handler(handler)
 	config := ResponseRequestRecorder(http.MethodPost, "http://localhost:8080/api/")
 	sctx := server.ServerContext{W: config.resp, R: config.req, DB: &mockDB}
@@ -43,7 +41,7 @@ func TestHandler(t *testing.T) {
 	}
 }
 
-func TestAuthHandler(t *testing.T) {
+func TestAuthorizedHandler(t *testing.T) {
 	authHandler := Handler(handler)
 	config := ResponseRequestRecorder(http.MethodPost, "http://localhost:8080/api/")
 	config.req.Header.Add("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==")

@@ -1,5 +1,7 @@
 # restful api
 
+stand alone service application
+
 ## Development
 
 * docker-compose build - builds images
@@ -9,17 +11,30 @@
 ## Built with 
 
 * Docker
+* docker-compose
 * PostgreSQL
 * golang
 
-## Example
+## Testing
+
+`go run test ./...`
+
+## Environment
+
+To add a database url add an `.env` file with docker:
+
+`MODE=DOCKER`
+`DATABASE_DOCKER_URL={url}`
+
+To add a database url add an `.env` file with no docker:
+
+`MODE=NODOCKER`
+`DATABASE_DEV_URL={url}`
+
+## How to run the server:
 
 Inside cmd/ folder there is an executable main file 
-with endpoints (below) hosted on port `localhost:80`. 
-
-* localhost:8080/api/products - GET
-* localhost:8080/api/product?id=1234 - GET
-* localhost:8080/api/product/ - POST
+with endpoints hosted on port `localhost:80`. 
 
 Curl
 
