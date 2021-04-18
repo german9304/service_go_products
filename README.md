@@ -31,7 +31,7 @@ To add a database url add an `.env` file with no docker:
 `MODE=NODOCKER`
 `DATABASE_DEV_URL={url}`
 
-## How to run the server:
+## How to fetch data:
 
 Inside cmd/ folder there is an executable main file 
 with endpoints hosted on port `localhost:80`. 
