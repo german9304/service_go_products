@@ -11,10 +11,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type message struct {
-	Message string `json:"message"`
-}
-
 func productsHandler(ctx *server.ServerContext) error {
 	rows, err := ctx.DB.QueryAll()
 	type ProductsResponse struct {
@@ -48,7 +44,13 @@ func createProductHandler(ctx *server.ServerContext) error {
 	ctx.R.Header.Set("Content-type", "application/json")
 	body := ctx.R.Body
 	b, err := ioutil.ReadAll(body)
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal(b, &data)
+	if err != nil {
+		return err
+	}
 	newProduct, err := ctx.DB.CreateRow(data.Name, data.Price)
 	if err != nil {
 		return err
