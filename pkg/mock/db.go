@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"goapi/model"
+	"github.com/goapi/model"
 )
 
 // MockProducts  used to mock database when calling in routes

@@ -2,12 +2,13 @@ package server
 
 import (
 	"encoding/json"
-	"goapi/mock"
-	"goapi/model"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/goapi/mock"
+	"github.com/goapi/model"
 
 	// "strings"
 	"io/ioutil"

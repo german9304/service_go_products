@@ -2,11 +2,11 @@ package db
 
 import (
 	"database/sql"
-	"goapi/model"
 	"log"
 	"os"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/goapi/model"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
 

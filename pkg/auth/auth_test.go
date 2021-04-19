@@ -1,11 +1,13 @@
 package auth
 
 import (
-	"goapi/mock"
-	"goapi/server"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/goapi/server"
+
+	"github.com/goapi/mock"
 )
 
 var (

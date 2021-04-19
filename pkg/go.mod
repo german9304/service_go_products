@@ -1,4 +1,4 @@
-module goapi
+module github.com/goapi
 
 go 1.14
 

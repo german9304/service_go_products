@@ -1,9 +1,10 @@
 package auth
 
 import (
-	"goapi/server"
 	"log"
 	"net/http"
+
+	"github.com/goapi/server"
 )
 
 // Handler handler to authenticate user

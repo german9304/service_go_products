@@ -2,9 +2,10 @@ package server
 
 import (
 	"encoding/json"
-	mydb "goapi/db"
 	"log"
 	"net/http"
+
+	mydb "github.com/goapi/db"
 )
 
 func isValidMethod(currentRoute route, req *http.Request) bool {

@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"goapi/model"
-	"goapi/server"
 	"io/ioutil"
 	"log"
+
+	"github.com/goapi/model"
+	"github.com/goapi/server"
 
 	"github.com/joho/godotenv"
 )
