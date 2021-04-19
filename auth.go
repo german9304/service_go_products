@@ -1,15 +1,13 @@
-package auth
+package server
 
 import (
 	"log"
 	"net/http"
-
-	"github.com/goapi/server"
 )
 
 // Handler handler to authenticate user
-func Handler(h server.HandlerContext) server.HandlerContext {
-	return func(ctx *server.ServerContext) error {
+func AuthHandler(h HandlerContext) HandlerContext {
+	return func(ctx *ServerContext) error {
 		username, password, ok := ctx.R.BasicAuth()
 		if ok {
 			log.Printf("user: %s is authenticated with %s \n", username, password)

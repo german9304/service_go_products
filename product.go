@@ -1,4 +1,4 @@
-package model
+package server
 
 import "database/sql"
 
@@ -7,14 +7,6 @@ type Product struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Price int    `json:"price"`
-}
-
-func New(id, name string, price int) Product {
-	return Product{
-		id,
-		name,
-		price,
-	}
 }
 
 func Products(rows *sql.Rows) ([]Product, error) {

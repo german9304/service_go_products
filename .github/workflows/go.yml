@@ -8,10 +8,6 @@ on:
   pull_request:
     branches: [ master ]
 
-defaults:
-  run:
-    working-directory: ./pkg
-
 jobs:
   restapi:
     runs-on: ubuntu-latest

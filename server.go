@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
-	mydb "github.com/goapi/db"
 )
 
 func isValidMethod(currentRoute route, req *http.Request) bool {
@@ -17,13 +15,16 @@ func isValidMethod(currentRoute route, req *http.Request) bool {
 type ServerContext struct {
 	W  http.ResponseWriter
 	R  *http.Request
-	DB mydb.Database
+	DB Queries
 }
 
 // JSON makes an HTTP response with content-type of json
 func (ctx *ServerContext) JSON(data interface{}) error {
 	ctx.W.Header().Set("Content-type", "application/json")
 	b, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
 	_, err = ctx.W.Write(b)
 	if err != nil {
 		return err
@@ -63,7 +64,7 @@ func (s *Server) PUT(path string, h HandlerContext) {
 }
 
 // handles any incoming requests and maps the request to its HTTP method
-func (s *Server) handlerServer(db mydb.Database) http.HandlerFunc {
+func (s *Server) handlerServer(db Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := ServerContext{w, r, db}
 		for i := 0; i < len(s.routes); i++ {
@@ -79,13 +80,12 @@ func (s *Server) handlerServer(db mydb.Database) http.HandlerFunc {
 		}
 		log.Println("method not allowed")
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
 	}
 }
 
 func (s *Server) Run(port string) error {
 	url := ":" + port
-	db, err := mydb.Start()
+	db, err := Start()
 	if err != nil {
 		return err
 	}

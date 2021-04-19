@@ -4,11 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"net/http/httptest"
 	"testing"
-
-	"github.com/goapi/mock"
-	"github.com/goapi/model"
 
 	// "strings"
 	"io/ioutil"
@@ -16,31 +12,11 @@ import (
 
 // Init variables for testing
 var (
-	myServer Server            = Server{}
-	mockDB   mock.MockProducts = mock.MockProducts{}
+	myServer Server = Server{}
 )
 
-type RequestConfig struct {
-	req  *http.Request
-	resp *httptest.ResponseRecorder
-}
-
-func ResponseRequestRecorder(method, url string) RequestConfig {
-	req := httptest.NewRequest(method, url, nil)
-	resp := httptest.NewRecorder()
-	return RequestConfig{req, resp}
-}
-
-func handler(ctx *ServerContext) error {
-	_, err := ctx.W.Write([]byte(`hello world`))
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 type ProductsResponse struct {
-	Products []model.Product `json:"products"`
+	Products []Product `json:"products"`
 }
 
 func databaseHanlder(ctx *ServerContext) error {
@@ -52,7 +28,7 @@ func databaseHanlder(ctx *ServerContext) error {
 }
 
 func TestHTTPMethods(t *testing.T) {
-	myServer.POST("/api/", handler)
+	myServer.POST("/api/", mockHandler)
 	h := myServer.handlerServer(&mockDB)
 	config := ResponseRequestRecorder(http.MethodPost, "http://localhost:8080/api/")
 	h(config.resp, config.req)
@@ -75,6 +51,9 @@ func TestHTTPGetMethodDB(t *testing.T) {
 	config := ResponseRequestRecorder(http.MethodGet, "http://localhost:8080/api/")
 	h(config.resp, config.req)
 	bodyData, err := ioutil.ReadAll(config.resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 	var data ProductsResponse
 	err = json.Unmarshal(bodyData, &data)
 	if err != nil {

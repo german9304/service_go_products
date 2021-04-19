@@ -5,16 +5,15 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/goapi/model"
-	"github.com/goapi/server"
+	service "github.com/goapi"
 
 	"github.com/joho/godotenv"
 )
 
-func productsHandler(ctx *server.ServerContext) error {
+func productsHandler(ctx *service.ServerContext) error {
 	rows, err := ctx.DB.QueryAll()
 	type ProductsResponse struct {
-		Products []model.Product `json:"products"`
+		Products []service.Product `json:"products"`
 	}
 	if err != nil {
 		return err
@@ -22,7 +21,7 @@ func productsHandler(ctx *server.ServerContext) error {
 	return ctx.JSON(ProductsResponse{rows})
 }
 
-func productHandler(ctx *server.ServerContext) error {
+func productHandler(ctx *service.ServerContext) error {
 	query := ctx.R.URL.Query()
 	_, ok := query["id"]
 	if ok {
@@ -35,7 +34,7 @@ func productHandler(ctx *server.ServerContext) error {
 	return nil
 }
 
-func createProductHandler(ctx *server.ServerContext) error {
+func createProductHandler(ctx *service.ServerContext) error {
 	type Data struct {
 		Name  string
 		Price int
@@ -65,7 +64,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	myServer := server.Server{}
+	myServer := service.Server{}
 	myServer.GET("/api/products", productsHandler)
 	myServer.GET("/api/product", productHandler)
 	myServer.POST("/api/product", createProductHandler)

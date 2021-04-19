@@ -1,4 +1,4 @@
-package db
+package server
 
 import (
 	"database/sql"
@@ -6,18 +6,17 @@ import (
 	"os"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/goapi/model"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
 
 	"github.com/rs/xid"
 )
 
-// Database Defines the Product interface, that receives a context
-type Database interface {
-	QueryAll() ([]model.Product, error)
-	QueryRow(id string) (model.Product, error)
-	CreateRow(name string, price int) (model.Product, error)
+// Query Defines the Product interface, that receives a context
+type Queries interface {
+	QueryAll() ([]Product, error)
+	QueryRow(id string) (Product, error)
+	CreateRow(name string, price int) (Product, error)
 	DeleteRow(id string) (string, error)
 }
 
@@ -27,7 +26,7 @@ type DB struct {
 }
 
 // QueryAll elements from db
-func (sqlDB *DB) QueryAll() ([]model.Product, error) {
+func (sqlDB *DB) QueryAll() ([]Product, error) {
 	statement := sq.
 		Select("id, name, price").
 		From("products").
@@ -37,26 +36,26 @@ func (sqlDB *DB) QueryAll() ([]model.Product, error) {
 	if err != nil {
 		return nil, err
 	}
-	return model.Products(rows)
+	return Products(rows)
 }
 
 // QueryRow queries a single row
-func (sqlDB *DB) QueryRow(id string) (model.Product, error) {
+func (sqlDB *DB) QueryRow(id string) (Product, error) {
 	statement := sq.
 		Select("id, name, price").
 		From("products").
 		Where("id", id)
 
-	product := model.Product{}
+	product := Product{}
 	err := statement.Scan(&product.ID, &product.Name, &product.Price)
 	if err != nil {
-		return model.Product{}, err
+		return Product{}, err
 	}
 	return product, nil
 }
 
 // CreateRow creates a new row in the database
-func (sqlDB *DB) CreateRow(name string, price int) (model.Product, error) {
+func (sqlDB *DB) CreateRow(name string, price int) (Product, error) {
 	guid := xid.New()
 	var productID string
 	statement := sq.
@@ -69,11 +68,11 @@ func (sqlDB *DB) CreateRow(name string, price int) (model.Product, error) {
 	_, err := statement.Exec()
 	if err != nil {
 		log.Println("error on create row", err)
-		return model.Product{}, err
+		return Product{}, err
 	}
 
 	log.Printf("current product id %s \n", productID)
-	return model.New(guid.String(), name, price), nil
+	return Product{ID: guid.String(), Name: name, Price: price}, nil
 }
 
 // DeleteRow deletes a row in the database
