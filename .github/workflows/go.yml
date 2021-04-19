@@ -8,11 +8,12 @@ on:
   pull_request:
     branches: [ master ]
 
+defaults:
+  run:
+    working-directory: ./pkg
+
 jobs:
   restapi:
-    defaults:
-    run:
-      working-directory: ./pkg
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
